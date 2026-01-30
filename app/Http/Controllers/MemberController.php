@@ -164,8 +164,11 @@ class MemberController extends Controller
             'gender' => 'nullable|in:male,female,other',
             'move_in_date' => 'nullable|date',
             'address' => 'nullable|string',
-            'is_active' => 'boolean',
         ]);
+
+        // Explicitly set the boolean based on the request
+        $validated['is_active'] = $request->boolean('is_active');
+        
         
         // Handle password update if provided
         if ($request->filled('password')) {

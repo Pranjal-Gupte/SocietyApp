@@ -6,6 +6,7 @@ use App\Http\Controllers\NoticeController;
 use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\VisitorController;
+use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -31,9 +32,31 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('complaints/{complaint}/update-status', [ComplaintController::class, 'updateStatus'])->name('complaints.update-status');
     Route::post('complaints/{complaint}/add-update', [ComplaintController::class, 'addUpdate'])->name('complaints.add-update');
     
-    Route::get('/payments', function() {
-        return view('coming-soon', ['feature' => 'Payments']);
-    })->name('payments.index');
+    Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
+    Route::get('/payments/bills/create', [PaymentController::class, 'create'])->name('payments.create');
+    Route::post('/payments/bills', [PaymentController::class, 'store'])->name('payments.store');
+    Route::get('/payments/bills/{bill}', [PaymentController::class, 'show'])->name('payments.show');
+    
+    // Payment Recording
+    Route::get('/payments/bills/{bill}/record', [PaymentController::class, 'recordPaymentForm'])->name('payments.record');
+    Route::post('/payments/bills/{bill}/record', [PaymentController::class, 'recordPayment'])->name('payments.store-payment');
+    
+    // Bill Management
+    Route::patch('/payments/bills/{bill}/cancel', [PaymentController::class, 'cancel'])->name('payments.cancel');
+    
+    // Transaction History
+    Route::get('/payments/transactions', [PaymentController::class, 'transactions'])->name('payments.transactions');
+    
+    // Outstanding Report
+    Route::get('/payments/outstanding', [PaymentController::class, 'outstanding'])->name('payments.outstanding');
+    
+    // Bulk Generation
+    Route::get('/payments/bulk-generate', [PaymentController::class, 'bulkGenerateForm'])->name('payments.bulk-generate');
+    Route::post('/payments/bulk-generate', [PaymentController::class, 'bulkGenerate'])->name('payments.bulk-store');
+    
+    // Receipt Download
+    Route::get('/payments/receipts/{bill}', [PaymentController::class, 'downloadReceipt'])->name('payments.receipt');
+    
     
     Route::get('/bookings', function() {
         return view('coming-soon', ['feature' => 'Facility Booking']);

@@ -192,6 +192,7 @@
                     {{-- Active Status --}}
                     <div class="md:col-span-2">
                         <label class="flex items-center gap-2">
+                            <input type="hidden" name="is_active" value="0">
                             <input type="checkbox" name="is_active" value="1" {{ old('is_active', $member->is_active) ? 'checked' : '' }}
                                 class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
                             <span class="text-sm font-medium text-gray-700">Active Member</span>

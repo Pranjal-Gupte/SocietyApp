@@ -26,7 +26,13 @@ class UserPolicy
         }
         
         // Users can view their own profile
-        return $user->id === $member->id;
+        if( $user->id === $member->id) {
+            return true;
+        }
+
+        // Allow residents to view other members in the directory
+        // As long as the user is an active resident
+        return $user->is_active === true;
     }
 
     /**

@@ -18,8 +18,8 @@
         <div class="bg-white rounded-lg shadow p-6 border-l-4 border-blue-500">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-gray-500 text-sm">Pending Payments</p>
-                    <p class="text-2xl font-bold text-gray-800">₹{{ number_format($pendingPayments ?? 0, 0) }}</p>
+                    <p class="text-gray-500 text-sm">{{ auth()->user()->canManageSociety() ? 'Total Society Dues' : 'My Pending Balance' }}</p>
+                    <p class="text-2xl font-bold text-gray-800">₹{{ number_format($pendingPayments ?? 0, 2) }}</p>
                     <a href="{{ route('payments.index') }}" class="text-blue-600 text-sm hover:underline mt-1 inline-block">
                         View Details →
                     </a>
@@ -34,7 +34,7 @@
         <div class="bg-white rounded-lg shadow p-6 border-l-4 border-green-500">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-gray-500 text-sm">Active Complaints</p>
+                    <p class="text-gray-500 text-sm">{{ auth()->user()->canManageSociety() ? 'Total Open Complaints' : 'My Active Complaints' }}</p>
                     <p class="text-2xl font-bold text-gray-800">{{ $activeComplaints ?? 0 }}</p>
                     <a href="{{ route('complaints.index') }}" class="text-green-600 text-sm hover:underline mt-1 inline-block">
                         View All →
@@ -52,8 +52,11 @@
                 <div>
                     <p class="text-gray-500 text-sm">New Notices</p>
                     <p class="text-2xl font-bold text-gray-800">{{ $newNotices ?? 0 }}</p>
+                    @if(($newNotices ?? 0) > 0)
+                    <span class="flex h-2 w-2 rounded-full bg-red-500 animate-ping"></span>
+                    @endif
                     <a href="{{ route('notices.index') }}" class="text-orange-600 text-sm hover:underline mt-1 inline-block">
-                        View All →
+                        {{ ($newNotices ?? 0) > 0 ? 'Read Latest →' : 'View History →' }}
                     </a>
                 </div>
                 <svg class="w-10 h-10 text-orange-500 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -169,14 +172,14 @@
             @forelse($upcomingBills ?? [] as $bill)
                 <div class="p-4 flex items-center justify-between">
                     <div>
-                        <h3 class="font-medium text-gray-800">{{ $bill->type }}</h3>
+                        <h3 class="font-medium text-gray-800">{{ ucfirst($bill->payment_type) }}</h3>
                         <p class="text-sm text-gray-500">Due: {{ $bill->due_date->format('M d, Y') }}</p>
                     </div>
                     <div class="text-right">
                         <p class="text-lg font-bold text-gray-800">₹{{ number_format($bill->amount, 0) }}</p>
-                        @if($bill->status === 'unpaid')
+                        @if($bill->status !== 'paid')
                             <a href="{{ route('payments.show', $bill->id) }}" 
-                               class="mt-1 inline-block px-4 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition">
+                            class="mt-1 inline-block px-4 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition">
                                 Pay Now
                             </a>
                         @else
@@ -197,7 +200,7 @@
 
     {{-- Quick Actions (for residents) --}}
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <a href="#" 
+        <a href="{{ route('complaints.create') }}" 
            class="bg-white rounded-lg shadow p-6 hover:shadow-md transition group">
             <div class="flex items-center gap-4">
                 <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition">
@@ -212,7 +215,7 @@
             </div>
         </a>
 
-        <a href="#" 
+        <a href="{{ route('bookings.index') }}" 
            class="bg-white rounded-lg shadow p-6 hover:shadow-md transition group">
             <div class="flex items-center gap-4">
                 <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center group-hover:bg-green-200 transition">
